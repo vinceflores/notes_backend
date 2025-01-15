@@ -22,6 +22,7 @@ Implement a backend applicaiton for a notes app using best practices such as TDD
 - [ ] Setup initial database schema
 - [ ] Implement and test initial API without authentication
 - [ ] Introduce Logging
+- [ ] Configure Swagger
 - [ ] Setup authentication and authorization with Passport.js
 - [ ] Setup rate limiting
 - [ ] Tests
