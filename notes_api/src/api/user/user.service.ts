@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserDTO } from './dtos/user-dto';
 
@@ -13,6 +13,7 @@ interface IUserService {
 
 @Injectable()
 export class UserService implements IUserService {
+  private readonly logger = new Logger(UserService.name);
   private readonly select = {
     id: true,
     username: true,
@@ -21,24 +22,30 @@ export class UserService implements IUserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(user: Omit<UserDTO, 'id'>): Promise<UserNoPassword | null> {
-    return await this.prisma.user.create({
+    const result = await this.prisma.user.create({
       data: user,
       select: this.select,
     });
+    if (!result) this.logger.log('create');
+    return result;
   }
 
   async findOne(username: string): Promise<UserDTO | null> {
-    return await this.prisma.user.findUnique({
+    const result = await this.prisma.user.findUnique({
       where: { username },
     });
+    if (!result) this.logger.log('findOne');
+    return result;
   }
 
   async update(user: UserDTO): Promise<UserNoPassword | null> {
-    return await this.prisma.user.update({
+    const result = await this.prisma.user.update({
       where: { id: user.id },
       data: user,
       select: this.select,
     });
+    if (!result) this.logger.log('update');
+    return result;
   }
 
   async delete(id: string): Promise<boolean> {
@@ -46,6 +53,8 @@ export class UserService implements IUserService {
       await this.prisma.user.delete({ where: { id } });
       return true;
     } catch (error) {
+      this.logger.log('delete');
+      this.logger.error(error);
       return false;
     }
   }
