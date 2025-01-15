@@ -15,11 +15,13 @@ const testUsers: User[] = [
     password: 'password2',
   },
 ];
+
 const returnVal = {
   id: testUsers[0].id,
   username: testUsers[0].username,
 };
-const db = {
+
+const userDb = {
   findOne: jest.fn().mockResolvedValue(returnVal),
 };
 
@@ -31,7 +33,7 @@ describe('AuthService', () => {
         AuthService,
         {
           provide: UserService,
-          useValue: db,
+          useValue: userDb,
         },
       ],
     }).compile();
