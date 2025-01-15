@@ -19,7 +19,7 @@ const second = testUsers[1];
 
 const db = {
   user: {
-    findUnique: jest.fn().mockReturnValue(firstWithOutPassword),
+    findUnique: jest.fn().mockReturnValue(first),
     create: jest.fn().mockReturnValue(firstWithOutPassword),
     update: jest.fn(),
     delete: jest.fn(),
@@ -49,7 +49,7 @@ describe('UserService', () => {
 
   describe('findOne', () => {
     it('should call prismaService.user.findUnique with correct parameters', async () => {
-      expect(service.findOne(first)).resolves.toEqual(firstWithOutPassword);
+      expect(service.findOne(first.username)).resolves.toEqual(first);
     });
   });
 

@@ -6,7 +6,7 @@ type UserNoPassword = Omit<UserDTO, 'password'>;
 
 interface IUserService {
   create(user: Omit<UserDTO, 'id'>): Promise<UserNoPassword | null>;
-  findOne(user: UserDTO): Promise<UserNoPassword | null>;
+  findOne(username: string): Promise<UserDTO | null>;
   update(user: UserDTO): Promise<UserNoPassword | null>;
   delete(id: string): Promise<boolean>;
 }
@@ -27,10 +27,9 @@ export class UserService implements IUserService {
     });
   }
 
-  async findOne(user: UserDTO): Promise<UserNoPassword | null> {
+  async findOne(username: string): Promise<UserDTO | null> {
     return await this.prisma.user.findUnique({
-      where: { id: user.id },
-      select: this.select,
+      where: { username },
     });
   }
 
