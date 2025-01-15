@@ -55,26 +55,26 @@ describe('UserService', () => {
     });
   });
 
-  // describe('update', () => {
-  //   it('should update a user when changes are made', async () => {
-  //     const updatedUser = { ...first, username: 'UpdatedAlice' };
-  //     db.user.update = jest.fn().mockResolvedValue(updatedUser);
+  describe('update', () => {
+    it('should update a user when changes are made', async () => {
+      const updatedUser = { ...first, username: 'UpdatedAlice' };
+      db.user.update = jest.fn().mockResolvedValue(updatedUser);
 
-  //     await expect(service.update(updatedUser)).resolves.toEqual(updatedUser);
-  //     expect(prismaService.user.update).toHaveBeenCalledWith({
-  //       where: { id: updatedUser.id },
-  //       data: updatedUser,
-  //     });
-  //   });
+      await expect(service.update(updatedUser)).resolves.toEqual(updatedUser);
+      expect(prismaService.user.update).toHaveBeenCalledWith({
+        where: { id: updatedUser.id },
+        data: updatedUser,
+      });
+    });
 
-  //   it('should not update a user when no changes are made', async () => {
-  //     db.user.update = jest.fn().mockResolvedValue(first);
+    it('should not update a user when no changes are made', async () => {
+      db.user.update = jest.fn().mockResolvedValue(first);
 
-  //     await expect(service.update(first)).resolves.toEqual(first);
-  //     expect(prismaService.user.update).toHaveBeenCalledWith({
-  //       where: { id: first.id },
-  //       data: first,
-  //     });
-  //   });
-  // });
+      await expect(service.update(first)).resolves.toEqual(first);
+      expect(prismaService.user.update).toHaveBeenCalledWith({
+        where: { id: first.id },
+        data: first,
+      });
+    });
+  });
 });

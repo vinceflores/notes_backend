@@ -24,7 +24,10 @@ export class UserService implements IUserService {
   }
 
   async update(user: UserDTO): Promise<UserDTO | null> {
-    throw new Error('Method not implemented.');
+    return await this.prisma.user.update({
+      where: { id: user.id },
+      data: user,
+    });
   }
 
   async delete(user: UserDTO): Promise<boolean> {
