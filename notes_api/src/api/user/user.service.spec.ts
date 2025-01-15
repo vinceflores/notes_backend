@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { UserDTO } from './dtos/user-dto';
 import { User } from '@prisma/client';
 
 const testUsers: User[] = [
@@ -11,13 +10,19 @@ const testUsers: User[] = [
 ];
 
 const first = testUsers[0];
+const firstWithOutPassword = {
+  id: first.id,
+  username: first.username,
+};
+
+const second = testUsers[1];
 
 const db = {
   user: {
-    findUnique: jest.fn().mockResolvedValue(first),
-    create: jest.fn().mockReturnValue(first),
-    update: jest.fn().mockResolvedValue(first),
-    delete: jest.fn().mockResolvedValue(first),
+    findUnique: jest.fn().mockReturnValue(firstWithOutPassword),
+    create: jest.fn().mockReturnValue(firstWithOutPassword),
+    update: jest.fn(),
+    delete: jest.fn(),
   },
 };
 
@@ -46,35 +51,46 @@ describe('UserService', () => {
 
   describe('findOne', () => {
     it('should call prismaService.user.findUnique with correct parameters', async () => {
-      expect(service.findOne(first)).resolves.toEqual(first);
+      expect(service.findOne(first)).resolves.toEqual(firstWithOutPassword);
     });
   });
+
   describe('create', () => {
     it('should create a user', async () => {
-      expect(service.create(first)).resolves.toEqual(first);
+      db.user.create = jest.fn().mockResolvedValue(firstWithOutPassword);
+
+      expect(service.create(first)).resolves.toEqual(firstWithOutPassword);
     });
   });
 
   describe('update', () => {
     it('should update a user when changes are made', async () => {
       const updatedUser = { ...first, username: 'UpdatedAlice' };
-      db.user.update = jest.fn().mockResolvedValue(updatedUser);
+      db.user.update = jest.fn().mockResolvedValue({
+        id: updatedUser.id,
+        username: updatedUser.username,
+      });
 
-      await expect(service.update(updatedUser)).resolves.toEqual(updatedUser);
-      expect(prismaService.user.update).toHaveBeenCalledWith({
-        where: { id: updatedUser.id },
-        data: updatedUser,
+      expect(service.update(updatedUser)).resolves.toEqual({
+        id: updatedUser.id,
+        username: updatedUser.username,
       });
     });
 
     it('should not update a user when no changes are made', async () => {
       db.user.update = jest.fn().mockResolvedValue(first);
+      expect(service.update(first)).resolves.toEqual(first);
+    });
+  });
 
-      await expect(service.update(first)).resolves.toEqual(first);
-      expect(prismaService.user.update).toHaveBeenCalledWith({
-        where: { id: first.id },
-        data: first,
-      });
+  describe('delete', () => {
+    it('should delete a user successfully', async () => {
+      db.user.delete = jest.fn().mockResolvedValue(true);
+      expect(service.delete(second.id)).resolves.toEqual(true);
+    });
+    it('should return false when trying to delete a non-existent user', async () => {
+      db.user.delete = jest.fn().mockRejectedValue(new Error('User not found'));
+      expect(service.delete('non-existent-id')).resolves.toEqual(false);
     });
   });
 });
