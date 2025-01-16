@@ -1,0 +1,29 @@
+previewsEnabled: true
+previewsExpireAfterDays: 1
+
+services:
+  - type: web
+    name: notes_backend_for_speer
+    env: docker
+    region: oregon
+    plan: starter
+    branch: main
+    dockerfilePath: ./notes_api/Dockerfile
+    dockerContext: ./notes_api
+    # domains:
+    #   - api.coolapp.dev
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+          fromDatabase:
+            name: notes-speer-test
+            property: connectionString
+
+
+databases:
+  - name: notes-speer-test
+    databaseName: notes-speer-test
+    user: notes_speer_test_user
