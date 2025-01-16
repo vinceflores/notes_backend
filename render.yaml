@@ -6,7 +6,7 @@ services:
     name: notes_backend_for_speer
     env: docker
     region: oregon
-    plan: starter
+    plan: free
     branch: main
     dockerfilePath: ./notes_api/Dockerfile
     dockerContext: ./notes_api
@@ -23,8 +23,8 @@ services:
           property: connectionString
 
 
-# databases:
-#   - name: notes-speer-test
-#     plan: free
+databases:
+  - name: notes-speer-test
+    plan: free
     # databaseName: notes-speer-test
     # user: notes_speer_test_user
