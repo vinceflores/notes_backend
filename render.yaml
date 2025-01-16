@@ -10,8 +10,6 @@ services:
     branch: main
     dockerfilePath: ./notes_api/Dockerfile
     dockerContext: ./notes_api
-    # domains:
-    #   - api.coolapp.dev
     envVars:
       - key: PORT
         value: 3000
@@ -21,7 +19,6 @@ services:
         fromDatabase:
           name: notes-speer-test
           property: connectionString
-
 
 databases:
   - name: notes-speer-test
