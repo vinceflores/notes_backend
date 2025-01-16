@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
@@ -22,8 +23,8 @@ model User {
 
 model Note {
   id     String @id @default(uuid())
-  userId String
+  title  String
   note   String
 
-  user User @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  user User[] 
 }
