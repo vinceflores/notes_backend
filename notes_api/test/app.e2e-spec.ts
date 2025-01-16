@@ -171,27 +171,82 @@ describe('AppController (e2e)', () => {
         expect(updateResponse.body.note).toBe(updateNoteDto.note);
       });
 
-      it('/notes/search (GET) - search note', async () => {
+      describe('search', () => {
         const createNoteDto = {
           title: 'Searchable Note',
           note: 'This note is for search testing.',
         };
-        await request(app.getHttpServer())
+        beforeAll(async () => {
+          await prisma.note.create({ data: createNoteDto });
+        });
+        it('should return createNoteDTO with single word query', async () => {
+          const response = await request(app.getHttpServer())
+            .get('/notes/search?q=Searchable')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+          expect(Array.isArray(response.body)).toBe(true);
+          expect(response.body.length).toBeGreaterThan(0);
+          expect(response.body[0].title).toContain('Searchable');
+        });
+        it('should return createNoteDTO with 2 words query', async () => {
+          const response = await request(app.getHttpServer())
+            .get('/notes/search?q=Searchable Note')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200);
+          expect(Array.isArray(response.body)).toBe(true);
+          expect(response.body.length).toBeGreaterThan(0);
+        });
+      });
+
+      it('/notes/:id/share {POST} - share a note to another user', async () => {
+        const newUser = { username: 'shareuser', password: 'sharepass' };
+
+        const newUserCreated = await prisma.user.create({ data: newUser });
+
+        // Create a note to be shared
+        const createNoteDto = {
+          title: 'Note to Share',
+          note: 'This note will be shared with another user.',
+        };
+        const createResponse = await request(app.getHttpServer())
           .post('/notes')
           .set('Authorization', `Bearer ${token}`)
           .send(createNoteDto)
           .expect(201);
 
-        const response = await request(app.getHttpServer())
-          .get('/notes/search?q=Searchable')
-          .set('Authorization', `Bearer ${token}`)
-          .expect(200);
+        const noteId = createResponse.body.id;
 
-        expect(Array.isArray(response.body)).toBe(true);
-        expect(response.body.length).toBeGreaterThan(0);
-        expect(response.body[0].title).toContain('Searchable');
+        // Share the note with the new user
+        await request(app.getHttpServer())
+          .post(`/notes/${noteId}/share`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ recipientId: newUserCreated.id })
+          .expect(201)
+          .expect(async (res) => {
+            expect(res.body).toHaveProperty('id', noteId);
+
+            // Verify that the new user has access to the shared note
+            const sharedNoteResponse = await prisma.note.findFirst({
+              where: {
+                id: noteId,
+                user: {
+                  some: { id: newUserCreated.id },
+                },
+              },
+              include: { user: true },
+            });
+            expect(sharedNoteResponse).not.toBeNull();
+            expect(sharedNoteResponse.title).toBe('Note to Share');
+            expect(sharedNoteResponse.note).toBe(
+              'This note will be shared with another user.',
+            );
+            expect(
+              sharedNoteResponse.user.some(
+                (user) => user.id === newUserCreated.id,
+              ),
+            ).toBe(true);
+          });
       });
-      // it('/notes/:id/share {POST} - share a note to another user', async () => {});
     });
   });
 

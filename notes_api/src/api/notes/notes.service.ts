@@ -64,23 +64,24 @@ export class NotesService {
   }
 
   async search(query: string, req: any) {
-    this.logger.log(query);
+    const formattedQuery = query.split(' ').join(' | ');
     return await this.prisma.note.findMany({
       where: {
         user: { every: { id: req.user.id } },
-        OR: [{ title: { contains: query } }, { note: { contains: query } }],
+        OR: [
+          { title: { search: formattedQuery } },
+          { note: { search: formattedQuery } },
+        ],
       },
     });
   }
 
   async share(id: string, body: ShareNoteDTO, req: any) {
-    return await this.prisma.user.update({
-      where: {
-        id: body.recipientId,
-      },
+    return await this.prisma.note.update({
+      where: { id },
       data: {
-        notes: {
-          connect: { id: req.user.id },
+        user: {
+          connect: { id: body.recipientId },
         },
       },
     });
