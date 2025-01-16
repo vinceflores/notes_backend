@@ -39,6 +39,10 @@ export class AuthService implements Auth {
       : null;
   }
 
+  async signup(user: Omit<UserDTO, 'id'>) {
+    return await this.user.create(user);
+  }
+
   async login(
     user: Omit<UserDTO, 'password'>,
   ): Promise<{ access_token: string }> {
