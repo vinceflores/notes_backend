@@ -22,8 +22,7 @@ services:
           name: notes-speer-test
           property: connectionString
 
-
 databases:
   - name: notes-speer-test
-    databaseName: notes-speer-test
+    # databaseName: notes-speer-test
     user: notes_speer_test_user
