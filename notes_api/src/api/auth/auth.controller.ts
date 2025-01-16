@@ -6,6 +6,8 @@ import {
   Body,
   HttpCode,
   Logger,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
@@ -20,25 +22,21 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    return await this.authService.login(req.user);
   }
 
   @Post('signup')
   async signup(@Body() body: UserDTO) {
-    return this.authService.signup(body);
+    const user = await this.authService.signup(body);
+    if (!user)
+      throw new HttpException('User Not Created', HttpStatus.BAD_REQUEST);
+    return user;
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('logout')
   @HttpCode(200)
   async logout(@Request() req) {
-    req.logout((err) => {
-      if (err) {
-        this.logger.error({
-          method: 'logout',
-          err,
-        });
-      }
-    });
+    return await req.logout(() => {});
   }
 }

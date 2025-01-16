@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { UserDTO } from '../user/dtos/user-dto';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { User } from '@prisma/client';
 
 interface Auth {
   validateUser(
@@ -10,6 +11,7 @@ interface Auth {
     pass: string,
   ): Promise<Omit<UserDTO, 'password'> | null>;
   login(user: Omit<UserDTO, 'password'>): Promise<{ access_token: string }>;
+  signup(user: Omit<UserDTO, 'id'>): Promise<Omit<User, 'password'> | null>;
 }
 
 @Injectable()
@@ -25,12 +27,13 @@ export class AuthService implements Auth {
     pass: string,
   ): Promise<Omit<UserDTO, 'password'> | null> {
     const user = await this.user.findOne(username);
-    if (!user)
+    if (!user) {
       this.logger.log({
         method: 'validateUser',
         error: 'User may not exist',
         input: { username, pass },
       });
+    }
     return user && user.password === pass
       ? {
           id: user.id,
@@ -39,7 +42,9 @@ export class AuthService implements Auth {
       : null;
   }
 
-  async signup(user: Omit<UserDTO, 'id'>) {
+  async signup(
+    user: Omit<UserDTO, 'id'>,
+  ): Promise<Omit<User, 'password'> | null> {
     return await this.user.create(user);
   }
 

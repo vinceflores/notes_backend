@@ -10,6 +10,8 @@ import {
   Request,
   Logger,
   Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
@@ -43,8 +45,9 @@ export class NotesController {
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
   async findOne(@Param('id') id: string, @Request() req) {
-    this.logger.log('findOne');
-    return await this.notesService.findOne(id, req);
+    const note = await this.notesService.findOne(id, req);
+    if (!note) throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
+    return note;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -54,7 +57,15 @@ export class NotesController {
     @Body() updateNoteDto: UpdateNoteDto,
     @Request() req,
   ) {
-    return await this.notesService.update(id, updateNoteDto, req);
+    try {
+      return await this.notesService.update(id, updateNoteDto, req);
+    } catch (error) {
+      throw new HttpException(
+        'Note Not Updated',
+        HttpStatus.BAD_REQUEST,
+        error,
+      );
+    }
   }
 
   @UseGuards(JwtAuthGuard)

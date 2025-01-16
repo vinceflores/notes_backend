@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UserDTO } from './dtos/user-dto';
 
@@ -26,7 +26,10 @@ export class UserService implements IUserService {
       data: user,
       select: this.select,
     });
-    if (!result) this.logger.log('create');
+    if (!result) {
+      this.logger.log('create');
+      return null;
+    }
     return result;
   }
 
