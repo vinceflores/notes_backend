@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { User } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import { JwtService } from '@nestjs/jwt';
 const testUsers: User[] = [
   {
     id: uuidv4(),
@@ -31,6 +32,7 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        JwtService,
         {
           provide: UserService,
           useValue: userDb,
@@ -60,7 +62,7 @@ describe('AuthService', () => {
   });
   describe('testUser does not exist', () => {
     it('should return null', async () => {
-      db.findOne.mockResolvedValueOnce(null);
+      userDb.findOne = jest.fn().mockResolvedValueOnce(null);
       const user = await service.validateUser(
         'nonexistentuser',
         'wrongpassword',

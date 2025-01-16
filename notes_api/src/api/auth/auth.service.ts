@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { UserDTO } from '../user/dtos/user-dto';
 import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 interface Auth {
   validateUser(
@@ -43,7 +44,9 @@ export class AuthService implements Auth {
   ): Promise<{ access_token: string }> {
     const payload = { username: user.username, id: user.id };
     return {
-      access_token: this.jwt.sign(payload),
+      access_token: this.jwt.sign(payload, {
+        secret: jwtConstants.secret,
+      }),
     };
   }
 }

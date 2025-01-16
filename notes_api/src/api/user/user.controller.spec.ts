@@ -18,7 +18,7 @@ describe('UserController', () => {
             create: jest
               .fn<Promise<Omit<UserDTO, 'password'>>, [Omit<UserDTO, 'id'>]>()
               .mockImplementation((user) =>
-                Promise.resolve({ id: userId, ...user }),
+                Promise.resolve({ id: userId, username: user.username }),
               ),
           },
         },
