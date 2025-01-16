@@ -35,6 +35,7 @@ ENV EXPIRES_IN=${EXPIRES_IN}
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY prisma ./prisma/
 
 RUN yarn install --only=production
 
