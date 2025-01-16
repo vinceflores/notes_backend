@@ -17,7 +17,7 @@ RUN yarn install --only=development
 
 COPY . .
 
-RUN yarn run build
+RUN yarn build
 
 FROM node:lts as production
 
