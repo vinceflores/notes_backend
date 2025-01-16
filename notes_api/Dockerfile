@@ -1,4 +1,4 @@
-FROM node:lts As development
+FROM node:iron-alpine As development
 
 ARG DATABASE_URL
 ARG JWT_SECRET
@@ -19,7 +19,7 @@ COPY . .
 
 RUN yarn build
 
-FROM node:lts as production
+FROM node:iron-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
