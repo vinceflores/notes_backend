@@ -14,7 +14,6 @@ COPY package*.json ./
 COPY yarn.lock ./
 
 RUN yarn install --only=development
-RUN npx prisma generate
 
 COPY . .
 
