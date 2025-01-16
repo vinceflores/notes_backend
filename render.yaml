@@ -23,8 +23,8 @@ services:
           property: connectionString
 
 
-databases:
-  - name: notes-speer-test
-    plan: free
+# databases:
+#   - name: notes-speer-test
+#     plan: free
     # databaseName: notes-speer-test
     # user: notes_speer_test_user
