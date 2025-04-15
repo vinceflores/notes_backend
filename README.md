@@ -2,6 +2,8 @@
 
 # Demo and Documentation
 
+NOTE: Deployments are now unavailable
+
 1. Deployment on Render: [here](https://notes-backend-for-speer.onrender.com)
 2. Documentation on Postman: [here](https://documenter.getpostman.com/view/28402561/2sAYQZJY3Y)
 3. Simple Swggaer docs: [here](https://notes-backend-for-speer.onrender.com)
